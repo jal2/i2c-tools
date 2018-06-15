@@ -15,6 +15,7 @@
 #define WRITE 0
 #define ERASE 2
 #define PHEADER 3
+#define NO_ACTION 1000
 #define VER       "eepromer v 0.4 (c) Daniel Smolik 2001\n"
 #define HEAD_SIZE   sizeof(struct mini_inode)
 #define START_ADDR   0
@@ -82,7 +83,7 @@ void help(void)
 int main(int argc, char *argv[]){
 
 	int i, file, addr;
-	int  action; //in this variable will be (-r,-w,-e)
+	int  action=NO_ACTION; //in this variable will be (-r,-w,-e)
 	char device[45];
 	int force;
 
@@ -244,13 +245,13 @@ int block_write(int file,int dev_addr,int eeprom_addr,unsigned char *buf,int len
 		msg[0].addr = dev_addr;
 		msg[0].flags = 0;
 		msg[0].len = 2;
-		msg[0].buf = buff;
+		msg[0].buf = (char *)buff;
 	
 	
 		msg[1].addr = dev_addr;
 		msg[1].flags = I2C_M_NOSTART;
 		msg[1].len = lenght;
-		msg[1].buf = buf;
+		msg[1].buf = (char *)buf;
 
 
 		msgst.msgs = msg;	
@@ -277,7 +278,7 @@ int block_write(int file,int dev_addr,int eeprom_addr,unsigned char *buf,int len
 int block_read(int file,int dev_addr,int eeprom_addr,unsigned char *buf){
 
 	int ln;
-	char buff[2]; //={0x0,0x0};
+	unsigned char buff[2]; //={0x0,0x0};
 	
 	struct i2c_msg msg[2];
 		
@@ -296,13 +297,13 @@ int block_read(int file,int dev_addr,int eeprom_addr,unsigned char *buf){
 	msg[0].addr = dev_addr;
 	msg[0].flags = 0;
 	msg[0].len = 2;
-	msg[0].buf = buff;
+	msg[0].buf = (char *)buff;
 	
 	
 	msg[1].addr = dev_addr;
 	msg[1].flags = I2C_M_RD;
 	msg[1].len = MAX_BLK_SIZE;
-	msg[1].buf = buf;
+	msg[1].buf = (char *)buf;
 
 	
 	
@@ -397,11 +398,10 @@ int content_write(int file, int addr){
 
 	unsigned char buf[MAX_BLK_SIZE];
 	unsigned char pom; 
-	int i, j, k, delka, addr_cnt;
+	int i, j, delka, addr_cnt;
 	
 	delka=0;
 	addr_cnt=HEAD_SIZE;
-	k=0;
 
 	for(j=0;j<MAX_BLK_SIZE;j++)
 		buf[j]=0;
@@ -462,9 +462,8 @@ int content_write(int file, int addr){
 int content_read(int file, int addr){
 
 	unsigned char buf[MAX_BLK_SIZE];
-	int i, j, k, delka;
+	int i, j, k;
 	
-	delka=0;
 	k=0;
 	
 	
@@ -506,11 +505,8 @@ int content_read(int file, int addr){
 void erase(int file, int addr,int eeprom_size){
 
 	unsigned char buf[MAX_BLK_SIZE];
-	int i, j, k, delka;
+	int i, j;
 	
-	delka=0;
-	k=0;
-
 	for(j=0;j<MAX_BLK_SIZE;j++)
 		buf[j]=0;
 
@@ -609,7 +605,7 @@ int  inode_write(int file,int dev_addr,int lenght){
 		msg[0].addr = dev_addr;
 		msg[0].flags = 0;
 		msg[0].len = 2;
-		msg[0].buf = buff;
+		msg[0].buf = (char *)buff;
 	
 	
 		msg[1].addr = dev_addr;
@@ -644,7 +640,7 @@ int inode_read(int file,int dev_addr,void *p_inode ){
 	
 	#define  POK  32
 	int ln;
-	char buff[2]; //={0x0,0x0};
+	unsigned char buff[2]; //={0x0,0x0};
 	
 	struct i2c_msg msg[2];
 		
@@ -662,7 +658,7 @@ int inode_read(int file,int dev_addr,void *p_inode ){
 	msg[0].addr = dev_addr;
 	msg[0].flags = 0;
 	msg[0].len = 2;
-	msg[0].buf = buff;
+	msg[0].buf = (char *)buff;
 	
 	
 	msg[1].addr = dev_addr;

@@ -106,7 +106,7 @@ int eeprom_read(int fd,
 	i2cmsg.addr  = addr;
 	i2cmsg.flags = I2C_M_RD;
 	i2cmsg.len   = len;
-	i2cmsg.buf   = buf;
+	i2cmsg.buf   = (char *)buf;
 
 	if((i=ioctl(fd,I2C_RDWR,&msg_rdwr))<0){
 	    perror("ioctl()");
@@ -218,7 +218,7 @@ int main(int argc, char **argv){
      *** I'm not the one to blame of you screw your computer!
      ***/
     if(rwmode && ! force){
-	unsigned char warnbuf[4];
+	char warnbuf[4];
 	fprintf(stderr,"**WARNING**\n");
 	fprintf(stderr," - \tYou have chosen to WRITE to this eeprom.\n");
 	fprintf(stderr,"\tMake sure that this tiny chip is *NOT* vital to the\n");
